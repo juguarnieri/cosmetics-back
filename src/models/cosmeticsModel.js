@@ -68,12 +68,19 @@ const deleteCosmetic = async (id) => {
     }
     return { message: "Cosmético deletado com sucesso." };
 };
-
+const getCosmeticsByBrandId = async (brandId) => {
+    const result = await pool.query(
+        "SELECT * FROM cosmetics WHERE brand_id = $1",
+        [brandId]
+    );
+    return result.rows;
+};
 module.exports = { 
     getCosmetics, 
     getAllCosmetics, 
     getCosmeticById, 
     createCosmetic, 
     updateCosmetic, 
-    deleteCosmetic 
+    deleteCosmetic,
+    getCosmeticsByBrandId
 };

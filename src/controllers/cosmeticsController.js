@@ -66,5 +66,19 @@ const deleteCosmetic = async (req, res) => {
         res.status(500).json({ message: "Erro ao deletar cosmético." });
     }
 };
+const getCosmeticsByBrand = async (req, res) => {
+    try {
+        const { brandId } = req.params;
+        const cosmetics = await brandModel.getCosmeticsByBrandId(brandId);
 
-module.exports = { getAllCosmetics, getCosmeticById, getUserCosmetics, createCosmetic, updateCosmetic, deleteCosmetic };
+        if (!cosmetics || cosmetics.length === 0) {
+            return res.status(404).json({ message: "Nenhum cosmético encontrado para esta marca." });
+        }
+
+        res.json(cosmetics);
+    } catch (error) {
+        console.error("Erro ao buscar cosméticos da marca:", error);
+        res.status(500).json({ message: "Erro ao buscar cosméticos da marca." });
+    }
+};
+module.exports = { getAllCosmetics, getCosmeticsByBrand,  getCosmeticById, getUserCosmetics, createCosmetic, updateCosmetic, deleteCosmetic };
