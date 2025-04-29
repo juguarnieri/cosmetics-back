@@ -1,11 +1,26 @@
-const cosmeticModel = require("../models/cosmeticsModel");
+const cosmeticsModel = require("../models/cosmeticsModel");
 
 const getAllCosmetics = async (req, res) => {
     try {
-        const { title } = req.query;
-        const cosmetics = await cosmeticModel.getCosmetics(title);
-        res.json(cosmetics);
+        const { product } = req.query; // Obtém o filtro de produto da query string
+        console.log("🔎 Valor recebido de 'product':", product);
+
+        let cosmetics;
+
+        if (product) {
+            // Busca apenas cosméticos filtrados por produto
+            cosmetics = await cosmeticsModel.getAllCosmetics(product);
+        } else {
+            // Busca todos os cosméticos
+            cosmetics = await cosmeticsModel.getAllCosmetics();
+        }
+
+        res.status(200).json({
+            message: "Lista de cosméticos recuperada com sucesso.",
+            data: cosmetics,
+        });
     } catch (error) {
+        console.error("Erro ao buscar cosméticos:", error);
         res.status(500).json({ message: "Erro ao buscar cosméticos." });
     }
 };

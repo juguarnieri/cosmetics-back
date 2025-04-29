@@ -1,32 +1,25 @@
 const pool = require("../config/database");
 
-const getCosmetics = async (title) => {
-    if (!title) {
-        const result = await pool.query(`
-            SELECT cosmetics.*, brands.name AS brand_name 
-            FROM cosmetics 
-            LEFT JOIN brands ON cosmetics.brand_id = brands.id
-        `);
-        return result.rows;
-    } else {
-        const result = await pool.query(`
-            SELECT cosmetics.*, brands.name AS brand_name 
-            FROM cosmetics 
-            LEFT JOIN brands ON cosmetics.brand_id = brands.id 
-            WHERE cosmetics.name ILIKE $1
-        `, [`%${title}%`]);
-        return result.rows;
-    }
-};
 
-const getAllCosmetics = async () => {
-    const result = await pool.query(`
-        SELECT cosmetics.*, brands.name AS brand_name 
-        FROM cosmetics 
-        LEFT JOIN brands ON cosmetics.brand_id = brands.id
-    `);
+const getAllCosmetics = async (product) => {
+    let result;
+
+    if (product) {
+        // Consulta com filtro por produto
+        result = await pool.query(
+            "SELECT cosmetics.*, brands.name AS brand_name FROM cosmetics LEFT JOIN brands ON cosmetics.brand_id = brands.id WHERE cosmetics.product ILIKE $1 ORDER BY cosmetics.name ASC",
+            [`%${product}%`]
+        );
+    } else {
+        // Consulta sem filtro
+        result = await pool.query(
+            "SELECT cosmetics.*, brands.name AS brand_name FROM cosmetics LEFT JOIN brands ON cosmetics.brand_id = brands.id ORDER BY cosmetics.name ASC"
+        );
+    }
+
     return result.rows;
 };
+
 
 const getCosmeticById = async (id) => {
     const result = await pool.query(`
@@ -76,7 +69,6 @@ const getCosmeticsByBrandId = async (brandId) => {
     return result.rows;
 };
 module.exports = { 
-    getCosmetics, 
     getAllCosmetics, 
     getCosmeticById, 
     createCosmetic, 

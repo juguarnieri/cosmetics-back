@@ -15,11 +15,54 @@ router.use(apiKeyMiddleware); // 🔒 Aplica para todas as rotas abaixo
  * @swagger
  * /api/cosmetics:
  *   get:
- *     summary: Lista todos os cosméticos
+ *     summary: Lista todos os cosméticos ou filtra por produto
  *     tags: [Cosmetics]
+ *     parameters:
+ *       - in: query
+ *         name: product
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: Nome do produto para filtrar os cosméticos (opcional)
  *     responses:
  *       200:
- *         description: Lista de cosméticos
+ *         description: Lista de cosméticos recuperada com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         description: ID do cosmético
+ *                       name:
+ *                         type: string
+ *                         description: Nome do cosmético
+ *                       product:
+ *                         type: string
+ *                         description: Tipo de produto
+ *                       color:
+ *                         type: string
+ *                         description: Cor do cosmético
+ *                       type:
+ *                         type: string
+ *                         description: Tipo do cosmético
+ *                       price:
+ *                         type: number
+ *                         format: float
+ *                         description: Preço do cosmético
+ *                       brand_name:
+ *                         type: string
+ *                         description: Nome da marca associada
+ *       500:
+ *         description: Erro ao buscar cosméticos
  */
 router.get("/cosmetics", cosmeticController.getAllCosmetics);
 
