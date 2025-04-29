@@ -16,6 +16,24 @@ const createBrand = async (req, res) => {
         res.status(500).json({ message: "Erro ao criar marca." });
     }
 };
+const getCosmeticsByBrand = async (req, res) => {
+    try {
+        const { brandId } = req.params; // Obtém o ID da marca dos parâmetros da rota
+        const cosmetics = await brandModel.getCosmeticsByBrandId(brandId);
+
+        if (!cosmetics || cosmetics.length === 0) {
+            return res.status(404).json({ message: "Nenhum cosmético encontrado para esta marca." });
+        }
+
+        res.status(200).json({
+            message: "Lista de cosméticos da marca recuperada com sucesso.",
+            data: cosmetics,
+        });
+    } catch (error) {
+        console.error("Erro ao buscar cosméticos da marca:", error);
+        res.status(500).json({ message: "Erro ao buscar cosméticos da marca." });
+    }
+};
 
 module.exports = { createBrand };
 const getAllBrands = async (req, res) => {
@@ -83,4 +101,4 @@ const uploadBrandImage = async (req, res) => {
         res.status(500).json({ message: "Erro ao fazer upload da imagem." });
     }
 };
-module.exports = {createBrand, getAllBrands, uploadBrandImage, getBrand,  updateBrand, deleteBrand };
+module.exports = {createBrand, getCosmeticsByBrand, getAllBrands, uploadBrandImage, getBrand,  updateBrand, deleteBrand };

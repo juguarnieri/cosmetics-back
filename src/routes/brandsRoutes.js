@@ -25,7 +25,62 @@ router.use(apiKeyMiddleware);
  *         description: Lista de marcas
  */
 router.get("/brands", brandController.getAllBrands);
-
+/**
+ * @swagger
+ * /api/cosmetics/brand/{brandId}:
+ *   get:
+ *     summary: Lista cosméticos de uma marca específica
+ *     tags: [Cosmetics]
+ *     parameters:
+ *       - in: path
+ *         name: brandId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID da marca para buscar os cosméticos
+ *     responses:
+ *       200:
+ *         description: Lista de cosméticos da marca recuperada com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         description: ID do cosmético
+ *                       name:
+ *                         type: string
+ *                         description: Nome do cosmético
+ *                       product:
+ *                         type: string
+ *                         description: Tipo de produto
+ *                       color:
+ *                         type: string
+ *                         description: Cor do cosmético
+ *                       type:
+ *                         type: string
+ *                         description: Tipo do cosmético
+ *                       price:
+ *                         type: number
+ *                         format: float
+ *                         description: Preço do cosmético
+ *                       brand_name:
+ *                         type: string
+ *                         description: Nome da marca associada
+ *       404:
+ *         description: Nenhum cosmético encontrado para esta marca
+ *       500:
+ *         description: Erro ao buscar cosméticos da marca
+ */
+router.get("/cosmetics/brand/:brandId", brandController.getCosmeticsByBrand);
 /**
  * @swagger
  * /api/brands/upload:

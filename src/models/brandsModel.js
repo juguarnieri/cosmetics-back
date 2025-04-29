@@ -19,7 +19,13 @@ const getBrandById = async (id) => {
     }
     return result.rows[0];
 };
-
+const getCosmeticsByBrandId = async (brandId) => {
+    const result = await pool.query(
+        "SELECT cosmetics.*, brands.name AS brand_name FROM cosmetics LEFT JOIN brands ON cosmetics.brand_id = brands.id WHERE brands.id = $1",
+        [brandId]
+    );
+    return result.rows;
+};
 const updateBrand = async (id, name, photo) => {
     const result = await pool.query(
         "UPDATE brands SET name = $1, photo = $2 WHERE id = $3 RETURNING *",
@@ -39,4 +45,4 @@ const deleteBrand = async (id) => {
     return { message: "Marca deletada com sucesso." };
 };
 
-module.exports = { getBrands,createBrand, getBrandById, updateBrand, deleteBrand };
+module.exports = { getBrands,createBrand, getCosmeticsByBrandId ,getBrandById, updateBrand, deleteBrand };
