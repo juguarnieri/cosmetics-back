@@ -82,22 +82,20 @@ const createCosmetic = async (req, res) => {
 
 const updateCosmetic = async (req, res) => {
     try {
-        const { id } = req.params; // Obtém o ID do cosmético dos parâmetros da rota
+        const { id } = req.params; 
         const { name, product, color, type, price, brand_id } = req.body;
 
-        // Validação básica dos campos
         if (!name || !product || !color || !type || !price || !brand_id) {
             return res.status(400).json({ message: "Todos os campos são obrigatórios." });
         }
 
-        // Chama o método do modelo para atualizar o cosmético
         const updatedCosmetic = await cosmeticsModel.updateCosmetic(
             id,
             name,
             product,
             color,
             type,
-            parseFloat(price), // Certifique-se de que o preço é um número
+            parseFloat(price), 
             brand_id
         );
 
@@ -113,7 +111,7 @@ const updateCosmetic = async (req, res) => {
 
 const deleteCosmetic = async (req, res) => {
     try {
-        const message = await cosmeticModel.deleteCosmetic(req.params.id);
+        const message = await cosmeticsModel.deleteCosmetic(req.params.id);
         res.json(message);
     } catch (error) {
         res.status(500).json({ message: "Erro ao deletar cosmético." });

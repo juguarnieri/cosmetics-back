@@ -89,7 +89,6 @@ const uploadBrandImage = async (req, res) => {
             return res.status(400).json({ message: "Nenhuma imagem foi enviada!" });
         }
 
-        // Aqui você pode salvar as informações no banco de dados, se necessário
         res.status(200).json({
             message: "Upload realizado com sucesso!",
             data: {

@@ -2,36 +2,64 @@ const PDFDocument = require("pdfkit");
 const brandModel = require("../models/brandsModel");
 const cosmeticModel = require("../models/cosmeticsModel");
 
+const addTableHeader = (doc, headers, positions, widths) => {
+    const initialY = doc.y;
+    doc.fontSize(12).font("Helvetica-Bold");
+
+    headers.forEach((text, i) => {
+        doc.text(text, positions[i], initialY, {
+            width: widths[i],
+            align: "left",
+            ellipsis: true,
+            lineBreak: false
+        });
+    });
+
+    doc.moveTo(50, initialY + 15).lineTo(550, initialY + 15).stroke();
+    doc.y = initialY + 20; 
+};
+
+const addTableRow = (doc, data, positions, widths) => {
+    const rowHeight = 15;
+    const initialY = doc.y;
+
+    doc.font("Helvetica").fontSize(10);
+    data.forEach((text, i) => {
+        doc.text(String(text), positions[i], initialY, {
+            width: widths[i],
+            align: "left",
+            ellipsis: true,
+            lineBreak: false
+        });
+    });
+
+    doc.y = initialY + rowHeight;
+};
+
+const initializePDF = (res, title, filename) => {
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename=${filename}`);
+    const doc = new PDFDocument({ margin: 50 });
+    doc.pipe(res);
+    doc.fontSize(18).font("Helvetica-Bold").text(title, { align: "center" });
+    doc.moveDown(1);
+    return doc;
+};
+
 const exportBrandsPDF = async (req, res) => {
     try {
         const brands = await brandModel.getBrands();
+        const doc = initializePDF(res, "Relatório de Marcas", "brands.pdf");
 
-        res.setHeader("Content-Type", "application/pdf");
-        res.setHeader("Content-Disposition", "attachment; filename=brands.pdf");
+        const headers = ["ID", "Nome", "Foto"];
+        const positions = [50, 120, 300];
+        const widths = [50, 160, 200];
 
-        const doc = new PDFDocument({ margin: 50 });
-        doc.pipe(res);
+        addTableHeader(doc, headers, positions, widths);
 
-        // Título do relatório
-        doc.fontSize(18).font("Helvetica-Bold").text("Relatório de Marcas", { align: "center" });
-        doc.moveDown(1);
-
-        // Cabeçalho da tabela
-        doc.fontSize(12).font("Helvetica-Bold");
-        doc.text("ID", 50, doc.y, { width: 50, align: "left" });
-        doc.text("Nome", 100, doc.y, { width: 200, align: "left" });
-        doc.text("Foto", 300, doc.y, { width: 250, align: "left" });
-        doc.moveDown(0.5);
-        doc.strokeColor("#000").lineWidth(1).moveTo(50, doc.y).lineTo(550, doc.y).stroke();
-        doc.moveDown(0.5);
-
-        // Dados da tabela
-        doc.font("Helvetica").fontSize(10);
         brands.forEach((brand) => {
-            doc.text(brand.id, 50, doc.y, { width: 50, align: "left" });
-            doc.text(brand.name, 100, doc.y, { width: 200, align: "left" });
-            doc.text(brand.photo, 300, doc.y, { width: 250, align: "left" });
-            doc.moveDown(0.5);
+            const row = [brand.id, brand.name, brand.photo];
+            addTableRow(doc, row, positions, widths);
         });
 
         doc.end();
@@ -44,41 +72,25 @@ const exportBrandsPDF = async (req, res) => {
 const exportCosmeticsPDF = async (req, res) => {
     try {
         const cosmetics = await cosmeticModel.getAllCosmetics();
+        const doc = initializePDF(res, "Relatório de Cosméticos", "cosmetics.pdf");
 
-        res.setHeader("Content-Type", "application/pdf");
-        res.setHeader("Content-Disposition", "attachment; filename=cosmetics.pdf");
+        const headers = ["ID", "Nome", "Produto", "Cor", "Tipo", "Preço", "Marca"];
+        const positions = [50, 90, 190, 290, 350, 410, 470];
+        const widths =   [40, 90, 90,   50,  50,  50,  100];
 
-        const doc = new PDFDocument({ margin: 50 });
-        doc.pipe(res);
+        addTableHeader(doc, headers, positions, widths);
 
-        // Título do relatório
-        doc.fontSize(18).font("Helvetica-Bold").text("Relatório de Cosméticos", { align: "center" });
-        doc.moveDown(1);
-
-        // Cabeçalho da tabela
-        doc.fontSize(12).font("Helvetica-Bold");
-        doc.text("ID", 50, doc.y, { width: 50, align: "left" });
-        doc.text("Nome", 100, doc.y, { width: 100, align: "left" });
-        doc.text("Produto", 200, doc.y, { width: 100, align: "left" });
-        doc.text("Cor", 300, doc.y, { width: 50, align: "left" });
-        doc.text("Tipo", 350, doc.y, { width: 50, align: "left" });
-        doc.text("Preço", 400, doc.y, { width: 50, align: "left" });
-        doc.text("Marca", 450, doc.y, { width: 100, align: "left" });
-        doc.moveDown(0.5);
-        doc.strokeColor("#000").lineWidth(1).moveTo(50, doc.y).lineTo(550, doc.y).stroke();
-        doc.moveDown(0.5);
-
-        // Dados da tabela
-        doc.font("Helvetica").fontSize(10);
         cosmetics.forEach((cosmetic) => {
-            doc.text(cosmetic.id, 50, doc.y, { width: 50, align: "left" });
-            doc.text(cosmetic.name, 100, doc.y, { width: 100, align: "left" });
-            doc.text(cosmetic.product, 200, doc.y, { width: 100, align: "left" });
-            doc.text(cosmetic.color, 300, doc.y, { width: 50, align: "left" });
-            doc.text(cosmetic.type, 350, doc.y, { width: 50, align: "left" });
-            doc.text(cosmetic.price, 400, doc.y, { width: 50, align: "left" });
-            doc.text(cosmetic.brand_name, 450, doc.y, { width: 100, align: "left" });
-            doc.moveDown(0.5);
+            const row = [
+                cosmetic.id,
+                cosmetic.name,
+                cosmetic.product,
+                cosmetic.color,
+                cosmetic.type,
+                `R$ ${cosmetic.price}`,
+                cosmetic.brand_name
+            ];
+            addTableRow(doc, row, positions, widths);
         });
 
         doc.end();
